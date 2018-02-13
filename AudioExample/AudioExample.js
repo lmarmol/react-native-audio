@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   Platform,
   PermissionsAndroid,
+  Alert
 } from 'react-native';
 
 import Sound from 'react-native-sound';
@@ -98,13 +99,18 @@ class AudioExample extends Component {
     }
 
     async _pause() {
+      if (Platform.OS === "android" && Platform.Version <= 23) {
+        Alert.alert("Information", "Unfortunately, pause is not supported on your version of Android");
+        return;
+      }
+
       if (!this.state.recording) {
         console.warn('Can\'t pause, not recording!');
         return;
       }
     
       try {
-        const filePath = await AudioRecorder.pauseRecording();
+        await AudioRecorder.pauseRecording();
         this.setState({paused: !this.state.paused});
       } catch (error) {
         console.error(error);
